@@ -1,0 +1,3 @@
+[tick 00000000][20:02:23.881][INFO ] engine.c:11: Starting Engine initilaization
+[tick 00000000][20:02:23.889][ERROR] engine.c:16: 
+[tick 00000000][20:02:23.889][ERROR] main.c:17: 

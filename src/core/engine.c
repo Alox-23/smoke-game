@@ -1,4 +1,5 @@
 #include "engine.h"
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_video.h>
 
 bool engine_init(Engine *engine, const char *title){
@@ -9,17 +10,25 @@ bool engine_init(Engine *engine, const char *title){
 
     LOG_INFO("Starting Engine initilaization");
     
-    engine->running = true;
+    engine->running = false;
+
+    //initialize SDL
+    if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO)){
+        LOG_ERROR("%s", SDL_GetError());
+        return false; //error happened
+    }
 
     //initialize thie SDL_Window
     engine->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_RESIZABLE);
     if (!engine->window){
+        LOG_ERROR("%s", SDL_GetError());
         return false; //error happened
     }
 
     //initialize SDL_Renderer
     engine->renderer = SDL_CreateRenderer(engine->window, -1, 0);
     if (!engine->renderer){
+        LOG_ERROR("%s", SDL_GetError());
         return false; //error happened
     }
 
@@ -36,6 +45,7 @@ void engine_run(Engine *engine){
     LOG_INFO("Engine is running");
 
     engine->last_tick = SDL_GetTicks64();
+    engine->running = true;
 
     while (engine->running){
         // timing stuff
