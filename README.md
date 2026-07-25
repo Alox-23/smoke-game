@@ -24,4 +24,4 @@ The questline stories are not yet decided.
 
 ## Technologies used
 This game uses the ECS pattern to structure game elements.
-Also, we use C11 for this game.
+Also, we use C23 for this game.
