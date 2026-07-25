@@ -1,0 +1,55 @@
+Naming Conventions
+C / SDL3 / ECS Top-Down RPG Project
+
+Files
+-----
+snake_case.c / snake_case.h
+Include guards: PATH_H (e.g. world/chunk.h -> WORLD_CHUNK_H)
+
+Types
+-----
+PascalCase for structs/typedefs (Position, Chunk)
+Enums: PascalCase type name, PREFIX_SCREAMING_CASE members (TILE_SOLID, NPC_STATE_IDLE)
+Components: plain noun, no "Component" suffix (Position, not PositionComponent)
+
+Functions
+---------
+snake_case, verb-first, module-prefixed
+  chunk_get_tile(...)   not get_tile(...)
+  entity_create(...)
+Booleans read as a question: tile_is_solid(...), chunk_is_loaded(...)
+
+Variables
+---------
+snake_case for locals, params, fields
+Always disambiguate coordinate spaces - never bare x/y once more than one is in scope:
+  world_tx, world_ty  - world-space tile coords
+  local_x, local_y    - chunk-local tile coords
+  chunk_x, chunk_y    - which chunk
+
+Constants and Macros
+---------------------
+SCREAMING_SNAKE_CASE
+Bitflags explicitly shifted, e.g.:
+  #define HAS_POSITION (1u << 0)
+  #define HAS_VELOCITY (1u << 1)
+Prefer enum over #define for non-flag related constants
+
+ECS-Specific
+------------
+Component arrays: plural noun, parallel by index, e.g.:
+  Position positions[MAX_ENTITIES];
+  Velocity velocities[MAX_ENTITIES];
+Systems: <verb>_system (movement_system, render_system)
+Dense/packed query subsets: <Purpose>View (MovementView)
+Tag-only components: just a mask bit, no struct needed
+
+Globals
+-------
+Avoid where possible
+If unavoidable: g_ prefix, snake_case (g_world, g_renderer)
+
+General
+-------
+No invented abbreviations - only well-established ones (pos, vel, tx, ty)
+Prioritize clarity at the call site over brevity in the declaration
