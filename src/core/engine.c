@@ -18,7 +18,7 @@ bool engine_init(Engine *engine, const char *title){
         return false; //error happened
     }
 
-    //initialize thie SDL_Window
+    //initialize SDL_Window
     engine->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_RESIZABLE);
     if (!engine->window){
         LOG_ERROR("%s", SDL_GetError());
