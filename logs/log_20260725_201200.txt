@@ -1,5 +1,0 @@
-[tick 00000000][20:12:00.115][INFO ] engine.c:11: Starting Engine initilaization
-[tick 00000000][20:12:00.163][INFO ] engine.c:34: Sucsesfully initialized Engine
-[tick 00000000][20:12:00.163][INFO ] engine.c:44: Engine is running
-[tick 00010099][20:12:01.678][INFO ] engine.c:88: Engine has quit
-[tick 00010099][20:12:01.682][INFO ] engine.c:100: Sucsesfully shutdown the Engine
