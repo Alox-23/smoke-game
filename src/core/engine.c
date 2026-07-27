@@ -1,11 +1,9 @@
 #include "engine.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_video.h>
 
 bool engine_init(Engine *engine, const char *title){
     if (!engine){
         LOG_ERROR("Invalid Engine argument");
-        return false;
+        return true;
     }
 
     LOG_INFO("Starting Engine initilaization");
@@ -15,25 +13,32 @@ bool engine_init(Engine *engine, const char *title){
     //initialize SDL
     if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO)){
         LOG_ERROR("%s", SDL_GetError());
-        return false; //error happened
+        return true; //error happened
     }
+
+    // Initialize SDL_image for PNG and JPG support
+    int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
+    if (!(IMG_Init(imgFlags) & imgFlags)) {
+        LOG_ERROR("%s", SDL_GetError());
+        return true;
+    }   
 
     //initialize SDL_Window
     engine->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_RESIZABLE);
     if (!engine->window){
         LOG_ERROR("%s", SDL_GetError());
-        return false; //error happened
+        return true; //error happened
     }
 
     //initialize SDL_Renderer
     engine->renderer = SDL_CreateRenderer(engine->window, -1, 0);
     if (!engine->renderer){
         LOG_ERROR("%s", SDL_GetError());
-        return false; //error happened
+        return true; //error happened
     }
 
     LOG_INFO("Sucsesfully initialized Engine");
-    return true;
+    return false;
 }
 
 void engine_run(Engine *engine){
@@ -98,6 +103,9 @@ void engine_shutdown(Engine *engine){
 
     SDL_DestroyWindow(engine->window);
     SDL_DestroyRenderer(engine->renderer);
+
+    SDL_Quit();
+    IMG_Quit();
     
     LOG_INFO("Sucsesfully shutdown the Engine");
 }

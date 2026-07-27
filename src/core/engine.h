@@ -1,8 +1,10 @@
 #ifndef CORE_ENGINE_H
 #define CORE_ENGINE_H
 
-#include <SDL2/SDL.h>
 #include <stdlib.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
+#include <SDL2/SDL_image.h>
 #include <stdbool.h>
 
 #include "log.h"
