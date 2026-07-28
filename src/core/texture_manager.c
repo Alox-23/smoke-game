@@ -28,13 +28,13 @@ SDL_Texture* texture_manager_load_texture(TextureManager *tm, SDL_Renderer* rend
     //load the surface and texture
     SDL_Surface* temp_surface = IMG_Load(texture_path);
     if (!temp_surface){
-        LOG_ERROR("%s", SDL_GetError());
+        LOG_ERROR("%s", IMG_GetError());
         return NULL;
     }
 
     SDL_Texture* texture_pointer = SDL_CreateTextureFromSurface(renderer, temp_surface);
+    SDL_FreeSurface(temp_surface);
     if (!texture_pointer){
-        SDL_FreeSurface(temp_surface);
         LOG_ERROR("%s", SDL_GetError());
         return NULL;
     }

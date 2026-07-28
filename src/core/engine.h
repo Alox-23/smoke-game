@@ -21,6 +21,8 @@ typedef struct{
 
     TextureManager texture_manager;
 
+    SDL_Texture *test;
+
     int window_width;
     int window_height;
 } Engine;

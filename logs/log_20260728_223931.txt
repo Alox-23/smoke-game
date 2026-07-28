@@ -1,0 +1,6 @@
+[tick 00000000][22:39:31.255][INFO ] engine.c:10: Starting engine initialization
+[tick 00000000][22:39:31.468][ERROR] texture_manager.c:31: Couldn't open ../assets/realistic/TEST7B.bpm: No such file or directory
+[tick 00000000][22:39:31.469][INFO ] engine.c:46: Successfully initialized engine
+[tick 00000000][22:39:31.469][INFO ] engine.c:66: Engine is running
+[tick 00000113][22:39:33.291][INFO ] engine.c:111: Engine has quit
+[tick 00000113][22:39:33.345][INFO ] engine.c:128: Sucsesfully shutdown the Engine

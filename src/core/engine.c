@@ -1,4 +1,5 @@
 #include "engine.h"
+#include <SDL2/SDL_render.h>
 #include <SDL2/SDL_video.h>
 
 bool engine_init(Engine *engine, const char *title){
@@ -38,6 +39,8 @@ bool engine_init(Engine *engine, const char *title){
         LOG_ERROR("Failed to initialize TextureManager");
         goto fail_renderer;
     }
+
+    engine-> test = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "/home/hackerman/Documents/smoke-game/assets/realistic/TEST7B.bmp");
 
     engine->running = false;
 
@@ -93,6 +96,8 @@ void engine_run(Engine *engine){
         // --- Render ---
         SDL_SetRenderDrawColor(engine->renderer, 20, 20, 30, 255);
         SDL_RenderClear(engine->renderer);
+
+        SDL_RenderCopy(engine->renderer, engine->test, NULL, NULL);
         
         SDL_RenderPresent(engine->renderer);
     }
