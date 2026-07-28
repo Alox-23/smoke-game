@@ -18,6 +18,9 @@ typedef struct{
 
     SDL_Renderer* renderer;
     SDL_Window* window;
+
+    TextureManager texture_manager;
+
     int window_width;
     int window_height;
 } Engine;

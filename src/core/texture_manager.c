@@ -1,20 +1,28 @@
 #include "texture_manager.h"
+#include <string.h>
 
 bool texture_manager_init (TextureManager *tm){
     if (!tm){
         LOG_ERROR("Invalid TextureManager argument");
-        return true;
+        return false;
     }
 
     tm->loaded_texture_count = 0;
 
-    return false;
+    return true;
 }
 
 SDL_Texture* texture_manager_load_texture(TextureManager *tm, SDL_Renderer* renderer, const char* texture_path){
     if (!tm){
         LOG_ERROR("Invalid TextureManager argument");
         return NULL;
+    }
+    
+    //check if the texture is already loaded
+    for (int i = 0; i < tm->loaded_texture_count; i++){
+        if (strcmp(tm->loaded_texture_paths[i], texture_path)){
+            return tm->loaded_textures[i]; //return if found
+        }
     }
 
     //load the surface and texture

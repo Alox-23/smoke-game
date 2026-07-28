@@ -1,52 +1,60 @@
 #include "engine.h"
+#include <SDL2/SDL_video.h>
 
 bool engine_init(Engine *engine, const char *title){
-    if (!engine){
-        LOG_ERROR("Invalid Engine argument");
-        return true;
+    if (!engine || !title){
+        LOG_ERROR("Invalid argument to engine_init");
+        return false;
     }
 
-    LOG_INFO("Starting Engine initilaization");
-    
-    engine->running = false;
+    LOG_INFO("Starting engine initialization");
 
-    //initialize SDL
-    if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO)){
-        LOG_ERROR("%s", SDL_GetError());
-        return true; //error happened
+    *engine = (Engine){0};
+
+    if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) != 0){
+        LOG_ERROR("SDL_Init: %s", SDL_GetError());
+        return false;
     }
 
-    // Initialize SDL_image for PNG and JPG support
-    int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
-    if (!(IMG_Init(imgFlags) & imgFlags)) {
-        LOG_ERROR("%s", SDL_GetError());
-        return true;
-    }   
+    const int img_flags = IMG_INIT_PNG | IMG_INIT_JPG;
+    if ((IMG_Init(img_flags) & img_flags) != img_flags){
+        LOG_ERROR("IMG_Init: %s", IMG_GetError());
+        goto fail_sdl;
+    }
 
-    //initialize SDL_Window
     engine->window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_RESIZABLE);
     if (!engine->window){
-        LOG_ERROR("%s", SDL_GetError());
-        return true; //error happened
+        LOG_ERROR("SDL_CreateWindow: %s", SDL_GetError());
+        goto fail_img;
     }
 
-    //initialize SDL_Renderer
-    engine->renderer = SDL_CreateRenderer(engine->window, -1, 0);
+    engine->renderer = SDL_CreateRenderer(engine->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!engine->renderer){
-        LOG_ERROR("%s", SDL_GetError());
-        return true; //error happened
+        LOG_ERROR("SDL_CreateRenderer: %s", SDL_GetError());
+        goto fail_window;
     }
 
-    //initialie TextureManager
-    TextureManager texture_manager = {};
-    if(texture_manager_init(&texture_manager)){
-        
+    if (!texture_manager_init(&engine->texture_manager)){
+        LOG_ERROR("Failed to initialize TextureManager");
+        goto fail_renderer;
     }
 
-    LOG_INFO("Sucsesfully initialized Engine");
+    engine->running = false;
+
+    LOG_INFO("Successfully initialized engine");
+    return true;
+
+fail_renderer:
+    SDL_DestroyRenderer(engine->renderer);
+fail_window:
+    SDL_DestroyWindow(engine->window);
+fail_img:
+    IMG_Quit();
+fail_sdl:
+    SDL_Quit();
+    *engine = (Engine){0};
     return false;
 }
-
 void engine_run(Engine *engine){
     if (!engine){
         LOG_ERROR("Invalid Engine argument");
@@ -107,11 +115,13 @@ void engine_shutdown(Engine *engine){
         return; //invalid engine argument
     }
 
-    SDL_DestroyWindow(engine->window);
-    SDL_DestroyRenderer(engine->renderer);
+    if (engine->renderer) SDL_DestroyRenderer(engine->renderer);
+    if (engine->window) SDL_DestroyWindow(engine->window);
 
-    SDL_Quit();
+    texture_manager_shutdown(&engine->texture_manager);
+
     IMG_Quit();
+    SDL_Quit();
     
     LOG_INFO("Sucsesfully shutdown the Engine");
 }
