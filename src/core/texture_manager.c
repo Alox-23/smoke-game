@@ -20,7 +20,7 @@ SDL_Texture* texture_manager_load_texture(TextureManager *tm, SDL_Renderer* rend
     
     //check if the texture is already loaded
     for (int i = 0; i < tm->loaded_texture_count; i++){
-        if (strcmp(tm->loaded_texture_paths[i], texture_path)){
+        if (strcmp(tm->loaded_texture_paths[i], texture_path) == 0){
             return tm->loaded_textures[i]; //return if found
         }
     }
