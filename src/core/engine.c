@@ -37,6 +37,12 @@ bool engine_init(Engine *engine, const char *title){
         return true; //error happened
     }
 
+    //initialie TextureManager
+    TextureManager texture_manager = {};
+    if(texture_manager_init(&texture_manager)){
+        
+    }
+
     LOG_INFO("Sucsesfully initialized Engine");
     return false;
 }

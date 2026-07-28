@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 #include "log.h"
+#include "texture_manager.h"
 
 typedef struct{
     bool running;
