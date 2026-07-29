@@ -5,7 +5,7 @@
 #include "core/log.h"
 
 int main (){
-    if (!log_init("logs")) {
+    if (log_init("logs")) {
         fprintf(stderr, "logger failed to initialize\n");
         return EXIT_FAILURE;
     }

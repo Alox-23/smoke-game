@@ -1,5 +1,5 @@
 CC := gcc
-CSTD := -std=c17
+CSTD := -std=c23
 WARN := -Wall -Wextra -Wpedantic
 OPT := -O2
 DBG := -g

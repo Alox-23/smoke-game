@@ -31,7 +31,7 @@ static Logger g_logger = {0};
 
 bool log_init(const char *log_dir) {
     if (g_logger.initialized) {
-        return true;
+        return false;
     }
 
     char dir[LOG_DIR_MAX];
@@ -41,7 +41,7 @@ bool log_init(const char *log_dir) {
     if (mkdir(dir, 0755) != 0 && errno != EEXIST) {
         fprintf(stderr, "log: failed to create log directory '%s': %s\n",
                 dir, strerror(errno));
-        return false;
+        return true;
     }
 
     time_t now = time(NULL);
@@ -77,14 +77,14 @@ bool log_init(const char *log_dir) {
     if (!g_logger.file) {
         fprintf(stderr, "log: failed to open log file '%s': %s\n",
                 path, strerror(errno));
-        return false;
+        return true;
     }
 
     g_logger.tick_count = 0;
     g_logger.min_level = LOG_LEVEL_INFO;
     g_logger.console_output = true;
     g_logger.initialized = true;
-    return true;
+    return false;
 }
 
 void log_shutdown(void) {

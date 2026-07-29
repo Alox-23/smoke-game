@@ -1,11 +1,14 @@
 #ifndef CORE_ENGINE_H
 #define CORE_ENGINE_H
 
-#include <SDL2/SDL.h>
 #include <stdlib.h>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
+#include <SDL2/SDL_image.h>
 #include <stdbool.h>
 
 #include "log.h"
+#include "texture_manager.h"
 
 typedef struct{
     bool running;
@@ -15,6 +18,11 @@ typedef struct{
 
     SDL_Renderer* renderer;
     SDL_Window* window;
+
+    TextureManager texture_manager;
+
+    SDL_Texture *test;
+
     int window_width;
     int window_height;
 } Engine;
