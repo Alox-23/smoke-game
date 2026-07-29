@@ -40,7 +40,7 @@ bool engine_init(Engine *engine, const char *title){
         goto fail_renderer;
     }
 
-    engine-> test = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "/home/hackerman/Documents/smoke-game/assets/realistic/TEST7B.bmp");
+    engine-> test = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "assets/realistic/TEST7B.bmp");
 
     engine->running = false;
 
