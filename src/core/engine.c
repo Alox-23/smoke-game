@@ -40,7 +40,19 @@ bool engine_init(Engine *engine, const char *title){
         goto fail_renderer;
     }
 
-    engine-> test = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "assets/realistic/TEST7B.bmp");
+    if (!world_init(&engine->world)){
+        LOG_ERROR("Failed to initialize World");
+        goto fail_renderer;
+    }
+
+    engine->test = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "assets/realistic/TEST7B.bmp");
+
+    engine->player = world_create_entity(&engine->world, HAS_POSITION | HAS_TEXTURE | HAS_VELOCITY | HAS_HEALTH); 
+    engine->world.textures[engine->player] = texture_manager_load_texture(&engine->texture_manager, engine->renderer, 
+            "assets/mana_seed/character_base/char_a_p1/char_a_p1_0bas_humn_v00.png");
+    engine->world.positions[engine->player] = (Position){0, 0, 0};
+    engine->world.velocities[engine->player] = (Velocity){0, 0, 0};
+    engine->world.healths[engine->player].hp = 100;
 
     engine->running = false;
 
@@ -70,36 +82,61 @@ void engine_run(Engine *engine){
     engine->running = true;
 
     while (engine->running){
-        // timing stuff
-        Uint64 now = SDL_GetTicks64();
-        float delta_time = (now - engine->last_tick) / 1000.0f;
-        engine->last_tick = now;
+        engine_tick(engine);
+        engine_render(engine);
+        engine_update(engine);
+    }
+}
 
-        //increment the tick for logger
-        log_tick();
+void engine_tick(Engine *engine){
+    if (!engine){
+        LOG_ERROR("Invalid Engine argument");
+        return;
+    }
 
-        // input and events
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_QUIT:
+    // timing stuff
+    Uint64 now = SDL_GetTicks64();
+    float delta_time = (now - engine->last_tick) / 1000.0f;
+    engine->last_tick = now;
+
+    //increment the tick for logger
+    log_tick();
+}
+
+void engine_render(Engine *engine){
+    if (!engine){
+        LOG_ERROR("Invalid Engine argument");
+        return;
+    }
+    // --- Render ---
+    SDL_SetRenderDrawColor(engine->renderer, 20, 20, 30, 255);
+    SDL_RenderClear(engine->renderer);
+
+    SDL_RenderCopy(engine->renderer, engine->test, NULL, NULL);
+
+    world_render_system(&engine->world, engine->renderer);
+
+    SDL_RenderPresent(engine->renderer);
+}
+
+void engine_update(Engine *engine){
+    if (!engine){
+        LOG_ERROR("Invalid Engine argument");
+        return;
+    }
+    // input and events
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+            case SDL_QUIT:
+                engine_quit(engine);
+                break;
+            case SDL_KEYDOWN:
+                if (event.key.keysym.sym == SDLK_ESCAPE) {
                     engine_quit(engine);
-                    break;
-                case SDL_KEYDOWN:
-                    if (event.key.keysym.sym == SDLK_ESCAPE) {
-                        engine_quit(engine);
-                    }
-                    break;
-            }
+                }
+                break;
         }
-
-        // --- Render ---
-        SDL_SetRenderDrawColor(engine->renderer, 20, 20, 30, 255);
-        SDL_RenderClear(engine->renderer);
-
-        SDL_RenderCopy(engine->renderer, engine->test, NULL, NULL);
-        
-        SDL_RenderPresent(engine->renderer);
     }
 }
 
@@ -122,11 +159,12 @@ void engine_shutdown(Engine *engine){
 
     if (engine->renderer) SDL_DestroyRenderer(engine->renderer);
     if (engine->window) SDL_DestroyWindow(engine->window);
-
     texture_manager_shutdown(&engine->texture_manager);
-
+    
     IMG_Quit();
     SDL_Quit();
+
+    world_shutdown(&engine->world);
     
     LOG_INFO("Sucsesfully shutdown the Engine");
 }

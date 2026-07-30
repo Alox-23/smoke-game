@@ -81,7 +81,7 @@ bool log_init(const char *log_dir) {
     }
 
     g_logger.tick_count = 0;
-    g_logger.min_level = LOG_LEVEL_INFO;
+    g_logger.min_level = LOG_LEVEL_DEBUG;
     g_logger.console_output = true;
     g_logger.initialized = true;
     return false;

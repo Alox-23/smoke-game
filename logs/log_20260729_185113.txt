@@ -1,6 +1,0 @@
-[tick 00000000][18:51:13.137][INFO ] engine.c:11: Starting engine initialization
-[tick 00000000][18:51:13.245][ERROR] texture_manager.c:31: Couldn't open /home/hackerman/Documents/smoke-game/assets/realistic/TEST7B.bmp: No such file or directory
-[tick 00000000][18:51:13.245][INFO ] engine.c:47: Successfully initialized engine
-[tick 00000000][18:51:13.245][INFO ] engine.c:67: Engine is running
-[tick 00000153][18:51:14.916][INFO ] engine.c:114: Engine has quit
-[tick 00000153][18:51:14.929][INFO ] engine.c:131: Sucsesfully shutdown the Engine
