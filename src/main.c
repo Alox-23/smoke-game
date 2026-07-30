@@ -11,7 +11,7 @@ int main (){
     }
     log_set_console_output(true);  
 
-    Engine engine = {};
+    Engine engine = {0};
     if (!engine_init(&engine, "Wizards & Warriors")){
         LOG_ERROR("%s", "Failed to initialize engine");
         return EXIT_FAILURE;
