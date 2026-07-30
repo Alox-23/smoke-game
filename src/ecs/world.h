@@ -17,6 +17,8 @@ typedef struct {
     Position positions[MAX_ENTITIES];
     Velocity velocities[MAX_ENTITIES];
     Health healths[MAX_ENTITIES];
+    Texture textures[MAX_ENTITIES];
+    Animation animations[MAX_ENTITIES];
 
     Entity free_slot_list[MAX_ENTITIES]; 
     ComponentFlag entity_masks[MAX_ENTITIES];
