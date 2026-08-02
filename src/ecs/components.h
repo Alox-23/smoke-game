@@ -7,8 +7,8 @@
 typedef struct{ float x, y, z; } Position;
 typedef struct{ float dx, dy, dz; } Velocity;
 typedef struct{ int hp; } Health;
-typedef SDL_Texture* Texture;
-typedef AnimationData Animation;
+typedef AnimationState Animation;
+typedef struct { SDL_Texture* texture; SDL_Rect src; SDL_Rect dst; } Sprite; 
 
 //Constant defines
 typedef unsigned long long ComponentFlag;
@@ -17,5 +17,6 @@ typedef unsigned long long ComponentFlag;
 #define HAS_HEALTH    (1ULL << 2)
 #define HAS_TEXTURE   (1ULL << 3)
 #define HAS_ANIMATION (1ULL << 4)
+#define HAS_SPRITE    (1ULL << 5)
 
 #endif
