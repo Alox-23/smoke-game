@@ -107,7 +107,7 @@ void engine_tick(Engine *engine){
 
     // timing stuff
     Uint64 now = SDL_GetTicks64();
-    float delta_time = (now - engine->last_tick) / 1000.0f;
+    engine->delta_time = (now - engine->last_tick) / 1000.0f;
     engine->last_tick = now;
 
     //increment the tick for logger
@@ -135,24 +135,25 @@ void engine_update(Engine *engine){
         LOG_ERROR("Invalid Engine argument");
         return;
     }
- 
+
+    input_poll_state(&engine->input_state);
+
+    world_input_system_entity(&engine->world, engine->player, &engine->input_state);
     world_health_system(&engine->world);
-    world_animation_system(&engine->world, engine->delta_time);
     world_movement_system(&engine->world, engine->delta_time);
-    
+    world_animation_system(&engine->world, engine->delta_time);
+
     // input and events
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_QUIT:
                 engine_quit(engine);
-                return;
                 break;
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
                     engine_quit(engine);
                 }
-                return;
                 break;
         }
     }

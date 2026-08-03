@@ -26,6 +26,8 @@ typedef struct{
 
     World world;
     Entity player;
+
+    InputState input_state;
 } Engine;
 
 bool engine_init(Engine *engine, const char *title); //called in main() - this initializes the engine's resourses
