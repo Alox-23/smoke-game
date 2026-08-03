@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "animation.h"
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_video.h>
 
@@ -46,13 +47,23 @@ bool engine_init(Engine *engine, const char *title){
     }
 
     engine->test = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "assets/realistic/TEST7B.bmp");
-
-    engine->player = world_create_entity(&engine->world, HAS_POSITION | HAS_TEXTURE | HAS_VELOCITY | HAS_HEALTH); 
-    engine->world.textures[engine->player] = texture_manager_load_texture(&engine->texture_manager, engine->renderer, 
-            "assets/mana_seed/character_base/char_a_p1/char_a_p1_0bas_humn_v00.png");
+    SDL_Texture* test2 = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "assets/mana_seed/character_base/char_a_p1/char_a_p1_0bas_humn_v00.png");
+    engine->player = world_create_entity(&engine->world, HAS_POSITION | HAS_TEXTURE | HAS_VELOCITY | HAS_HEALTH | HAS_ANIMATION | HAS_SPRITE); 
     engine->world.positions[engine->player] = (Position){0, 0, 0};
     engine->world.velocities[engine->player] = (Velocity){0, 0, 0};
     engine->world.healths[engine->player].hp = 100;
+
+    engine->world.sprites[engine->player].dst.w = 200;
+    engine->world.sprites[engine->player].dst.h = 200;
+    
+    AnimationState as = {};
+    AnimationClip ac = {};
+    animation_init_clip(&ac, test2);
+    animation_load_frames(&ac, 200, 6, 64, 64, 0, 4);
+    int animation_id = animation_load_clip(&as, &ac);
+    animation_play_clip(&as, animation_id);
+
+    engine->world.animations[engine->player] = as;
 
     engine->running = false;
 
@@ -124,17 +135,24 @@ void engine_update(Engine *engine){
         LOG_ERROR("Invalid Engine argument");
         return;
     }
+ 
+    world_health_system(&engine->world);
+    world_animation_system(&engine->world, engine->delta_time);
+    world_movement_system(&engine->world, engine->delta_time);
+    
     // input and events
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         switch (event.type) {
             case SDL_QUIT:
                 engine_quit(engine);
+                return;
                 break;
             case SDL_KEYDOWN:
                 if (event.key.keysym.sym == SDLK_ESCAPE) {
                     engine_quit(engine);
                 }
+                return;
                 break;
         }
     }

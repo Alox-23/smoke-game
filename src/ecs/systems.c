@@ -10,27 +10,32 @@ void world_movement_system(World *w, float delta_time) {
     unsigned int required = HAS_POSITION | HAS_VELOCITY;
     for (Entity e = 0; e < (Entity)w->entity_count; e++) {
         if ((entity_mask_check(w->entity_masks[e], required))) continue;
-        w->positions[e].x += w->velocities[e].dx;
-        w->positions[e].y += w->velocities[e].dy;
-        w->positions[e].z += w->velocities[e].dz;
+        w->positions[e].x += w->velocities[e].dx * delta_time;
+        w->positions[e].y += w->velocities[e].dy * delta_time;
+        w->positions[e].z += w->velocities[e].dz * delta_time;
+    }
+}
+
+void world_animation_system(World* w, float delta_time){
+    unsigned int required = HAS_SPRITE | HAS_ANIMATION;
+    for (Entity e = 0; e < (Entity)w->entity_count; e++){
+        if ((entity_mask_check(w->entity_masks[e], required))) continue;
+
+        animation_update_sate(&w->animations[e], delta_time);
+        w->sprites[e].src = *animation_get_rect(&w->animations[e]);
+        w->sprites[e].texture = animation_get_texture(&w->animations[e]);
     }
 }
 
 void world_render_system(World* w, SDL_Renderer* r){
-    unsigned int required = HAS_POSITION | HAS_TEXTURE;
+    unsigned int required = HAS_POSITION | HAS_SPRITE;
     for (Entity e = 0; e < w->entity_count; e++){
         if ((entity_mask_check(w->entity_masks[e], required))) continue;
        
-        LOG_DEBUG("Entity %u is being rendered", e);
+        w->sprites[e].dst.x = (int)w->positions[e].x;
+        w->sprites[e].dst.y = (int)w->positions[e].y;
 
-        SDL_Rect dst = {
-            (int)w->positions[e].x,
-            (int)w->positions[e].y,
-            100,
-            100
-        };
-
-        SDL_RenderCopy(r, w->textures[e], NULL, &dst);
+        SDL_RenderCopy(r, w->sprites[e].texture, &w->sprites[e].src, &w->sprites[e].dst);
     }
 }
 
