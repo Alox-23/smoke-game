@@ -43,3 +43,16 @@ void world_health_system(World *w) {
         }
     }
 }
+
+void world_input_system_entity(World* w, Entity e, InputState* state){
+    unsigned int requred = HAS_VELOCITY;
+    if ((entity_mask_check(w->entity_masks[e], requred))){
+        LOG_WARN("Entity %d does not have requred components for this entity_system");
+        return;
+    }
+
+    float magnitude = sqrt(w->velocities[e].dx + w->velocities[e].dy);
+
+    w->velocities[e].dx = state->move_x * PLAYER_SPEED / magnitude; 
+    w->velocities[e].dy = state->move_y * PLAYER_SPEED / magnitude; 
+}
