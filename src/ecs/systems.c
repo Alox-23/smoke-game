@@ -30,7 +30,15 @@ void world_animation_system(World* w, float delta_time){
     unsigned int required = HAS_SPRITE | HAS_ANIMATION;
     for (Entity e = 0; e < (Entity)w->entity_count; e++){
         if ((entity_mask_check(w->entity_masks[e], required))) continue;
-        animation_update_sate(&w->animations[e], delta_time);
+       
+        Velocity v = w->velocities[e];
+
+        if (v.dx > 0) animation_play_clip(&w->animations[e], animation_get_id_by_name(&w->animations[e], "walk_right"));
+        if (v.dx < 0) animation_play_clip(&w->animations[e], animation_get_id_by_name(&w->animations[e], "walk_left"));
+        if (v.dy > 0) animation_play_clip(&w->animations[e], animation_get_id_by_name(&w->animations[e], "walk_down"));
+        if (v.dy < 0) animation_play_clip(&w->animations[e], animation_get_id_by_name(&w->animations[e], "walk_up"));
+
+        if (v.dx != 0 || v.dy != 0 || v.dz != 0) animation_update_sate(&w->animations[e], delta_time);
         w->sprites[e].src = *animation_get_rect(&w->animations[e]);
         w->sprites[e].texture = animation_get_texture(&w->animations[e]);
     }

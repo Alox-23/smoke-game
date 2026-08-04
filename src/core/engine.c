@@ -60,8 +60,25 @@ bool engine_init(Engine *engine, const char *title){
     AnimationClip ac = {};
     animation_init_clip(&ac, test2);
     animation_load_frames(&ac, 200, 6, 64, 64, 0, 4);
-    int animation_id = animation_load_clip(&as, &ac);
-    animation_play_clip(&as, animation_id);
+    int walk_down = animation_load_clip(&as, ac, "walk_down");
+    
+    animation_init_clip(&ac, test2);
+    animation_load_frames(&ac, 200, 6, 64, 64, 0, 6);
+    int walk_right = animation_load_clip(&as, ac, "walk_right");
+    
+    animation_init_clip(&ac, test2);
+    animation_load_frames(&ac, 200, 6, 64, 64, 0, 5);
+    int walk_up = animation_load_clip(&as, ac, "walk_up");
+    
+    animation_init_clip(&ac, test2);
+    animation_load_frames(&ac, 200, 6, 64, 64, 0, 7);
+    int walk_left = animation_load_clip(&as, ac, "walk_left");
+
+    animation_init_clip(&ac, test2);
+    animation_load_frames(&ac, 200, 6, 64, 64, 0, 4);
+    int idle = animation_load_clip(&as, ac, "walk_down");
+
+    animation_play_clip(&as, animation_get_id_by_name(&as, "walk_down"));
 
     engine->world.animations[engine->player] = as;
 

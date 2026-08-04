@@ -1,4 +1,5 @@
 #include "animation.h"
+#include <string.h>
 
 bool animation_init_clip(AnimationClip* ac, SDL_Texture* atlas){
     if (!ac){
@@ -57,13 +58,14 @@ bool animation_load_frames(AnimationClip* ac, Uint32 between_time, int frame_cou
     return true;
 }
 
-int animation_load_clip(AnimationState* as, AnimationClip* ac){
-    if (!as || !ac){
+int animation_load_clip(AnimationState* as, AnimationClip ac, char* name){
+    if (!as){
         LOG_ERROR("Invalid AnimationState or AnimationClip");
         return INVALID_CLIP_INDEX;
     }
 
-    as->clips[as->clip_count] = *ac;
+    as->clips[as->clip_count] = ac;
+    as->clip_names[as->clip_count] = name;
     int index = as->clip_count;
     as->clip_count++;
 
@@ -75,6 +77,12 @@ bool animation_play_clip(AnimationState* as, int clip_index){
         LOG_ERROR("Invalid AnimationState");
         return false;
     }
+    if (clip_index == INVALID_CLIP_INDEX){
+        LOG_ERROR("Invalid clip_index value");
+        return false;
+    }
+
+    LOG_INFO("Playing clip with index %d", clip_index);
 
     as->active_clip_index = clip_index;
     
@@ -121,4 +129,19 @@ SDL_Texture* animation_get_texture(AnimationState* as){
     AnimationClip ac = as->clips[as->active_clip_index];
 
     return ac.atlas;
+}
+
+int animation_get_id_by_name(AnimationState* as, char* name){
+    if (!as){
+        LOG_ERROR("Invalid AnimationState argument");
+        return INVALID_CLIP_INDEX;
+    }
+
+    for (int i = 0; i < as->clip_count; i++){
+        if (strcmp(as->clip_names[i], name) == 0){
+            return i; //found the index of the animation with the correct name 
+        }
+    }
+
+    return INVALID_CLIP_INDEX;
 }
