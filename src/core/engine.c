@@ -59,24 +59,40 @@ bool engine_init(Engine *engine, const char *title){
     AnimationState as = {};
     AnimationClip ac = {};
     animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 6, 64, 64, 0, 4);
+    animation_load_frames(&ac, 500, 6, 64, 64, 0, 4);
     int walk_down = animation_load_clip(&as, ac, "walk_down");
     
     animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 6, 64, 64, 0, 6);
+    animation_load_frames(&ac, 500, 6, 64, 64, 0, 6);
     int walk_right = animation_load_clip(&as, ac, "walk_right");
     
     animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 6, 64, 64, 0, 5);
+    animation_load_frames(&ac, 500, 6, 64, 64, 0, 5);
     int walk_up = animation_load_clip(&as, ac, "walk_up");
     
     animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 6, 64, 64, 0, 7);
+    animation_load_frames(&ac, 500, 6, 64, 64, 0, 7);
     int walk_left = animation_load_clip(&as, ac, "walk_left");
 
     animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 6, 64, 64, 0, 4);
+    animation_load_frames(&ac, 500, 6, 64, 64, 0, 0);
     int idle = animation_load_clip(&as, ac, "walk_down");
+
+    animation_init_clip(&ac, test2);
+    animation_load_frames(&ac, 500, 1, 64, 64, 6, 1);
+    int jump_up = animation_load_clip(&as, ac, "jump_up");
+
+    animation_init_clip(&ac, test2);
+    animation_load_frames(&ac, 500, 1, 64, 64, 6, 2);
+    int jump_right= animation_load_clip(&as, ac, "jump_right");
+
+    animation_init_clip(&ac, test2);
+    animation_load_frames(&ac, 500, 1 , 64, 64, 6, 3);
+    int jump_left= animation_load_clip(&as, ac, "jump_left");
+
+    animation_init_clip(&ac, test2);
+    animation_load_frames(&ac, 500, 1, 64, 64, 6, 0);
+    int jump_down = animation_load_clip(&as, ac, "jump_down");
 
     animation_play_clip(&as, animation_get_id_by_name(&as, "walk_down"));
 

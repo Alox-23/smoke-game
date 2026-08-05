@@ -14,6 +14,7 @@ return false;
     ac->atlas = atlas;
 
     ac->frame_count = 0;
+    ac->freeze_frame = -1;
 
     ac->vertical_frames = false;
 
@@ -77,15 +78,19 @@ bool animation_play_clip(AnimationState* as, int clip_index){
         LOG_ERROR("Invalid AnimationState");
         return false;
     }
-    if (clip_index == INVALID_CLIP_INDEX){
-        LOG_ERROR("Invalid clip_index value");
+    if (clip_index < 0 || clip_index >= as->clip_count){
+        LOG_ERROR("clip_index %d out of range (clip_count %d)",
+                  clip_index, as->clip_count);
         return false;
     }
 
-    LOG_INFO("Playing clip with index %d", clip_index);
+    if (as->active_clip_index == clip_index) return true;   /* already playing, don't restart */
+
+    AnimationClip* ac = &as->clips[clip_index];
+    ac->current_frame_index = 0;
+    ac->last_time = SDL_GetTicks();
 
     as->active_clip_index = clip_index;
-    
     return true;
 }
 
@@ -97,6 +102,16 @@ void animation_update_sate(AnimationState* as, float delat_time){
 
     AnimationClip* ac = &as->clips[as->active_clip_index];
     Uint32 now = SDL_GetTicks();
+
+    if (ac->current_frame_index == ac->freeze_frame){
+        //current frame is a freeze frame, so no update needs to happen
+        if (as->unfreeze); //if we should unfreeze current frame then we dont terminate this function
+        else return;
+    }
+
+    else {
+        as->unfreeze = false; //just making sure its false when no freeze happened :)
+    }
 
     if (now - ac->last_time > ac->between_time){
         ac->current_frame_index++;
@@ -144,4 +159,31 @@ int animation_get_id_by_name(AnimationState* as, char* name){
     }
 
     return INVALID_CLIP_INDEX;
+}
+
+
+bool animation_set_freeze_on_frame(AnimationState* as, char* clip_name, int frame){
+    if (!as || !clip_name){
+        LOG_ERROR("Invalid AnimationState or clip_name is invalid");
+        return false;
+    }
+
+    int id = animation_get_id_by_name(as, clip_name);
+
+    as->clips[id].freeze_frame = frame; //set that clips freeze frame to the value passed to the func
+
+    return true;
+}
+
+bool animation_unfreeze(AnimationState* as){
+    if (!as){
+        LOG_ERROR("Invalid AnimationState argument");
+        return false;
+    }
+
+    if (!as->unfreeze){
+         as->unfreeze = true; //only unfreeze the fram if its actualy frozen
+        LOG_INFO("Unfreezing frame...");
+    }
+    return true;
 }

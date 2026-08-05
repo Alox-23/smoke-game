@@ -4,8 +4,8 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-#define PLAYER_SPEED 200
-#define PLAYER_JUMP_STRENGTH 500
+#define PLAYER_SPEED 400
+#define PLAYER_JUMP_STRENGTH 700
 #define GRAVITY 1500
 
 typedef struct{
