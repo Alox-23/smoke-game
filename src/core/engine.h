@@ -22,7 +22,6 @@ typedef struct{
     int window_width;
     int window_height;
     TextureManager texture_manager;
-    SDL_Texture *test;
 
     World world;
     Entity player;
