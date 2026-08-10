@@ -9,7 +9,7 @@ typedef struct{ float dx, dy, dz; } Velocity;
 typedef struct{ int hp; } Health;
 typedef AnimationState Animation;
 typedef struct { SDL_Texture* texture; SDL_Rect src; SDL_Rect dst; } Sprite; 
-typedef DontScroll void;
+typedef char DontScroll;
 
 //Constant defines
 typedef unsigned long long ComponentFlag;

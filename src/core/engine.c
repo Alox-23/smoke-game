@@ -48,7 +48,7 @@ bool engine_init(Engine *engine, const char *title){
 
     SDL_Texture* test = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "assets/realistic/TEST7B.bmp");
     SDL_Texture* test2 = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "assets/mana_seed/character_base/char_a_p1/char_a_p1_0bas_humn_v00.png");
-    engine->player = world_create_entity(&engine->world, HAS_POSITION | HAS_VELOCITY | HAS_HEALTH | HAS_ANIMATION | HAS_SPRITE); 
+    engine->player = world_create_entity(&engine->world, HAS_POSITION | HAS_VELOCITY | HAS_HEALTH | HAS_ANIMATION | HAS_SPRITE | HAS_DONT_SCROLL); 
     engine->world.positions[engine->player] = (Position){0, 0, 0};
     engine->world.velocities[engine->player] = (Velocity){0, 0, 0};
     engine->world.healths[engine->player].hp = 100;
@@ -57,8 +57,11 @@ bool engine_init(Engine *engine, const char *title){
     engine->world.sprites[engine->player].dst.h = 200;
 
     Entity bg_texture = world_create_entity(&engine->world, HAS_POSITION | HAS_SPRITE);
+    int w;
+    int h;
+    int result = SDL_QueryTexture(engine->world.sprites[bg_texture].texture, NULL, NULL, &w, &h);
     engine->world.positions[bg_texture] = (Position){0, 0, 0};
-    engine->world.sprites[bg_texture] = (Sprite){test, (SDL_Rect){0}, (SDL_Rect{0});
+    engine->world.sprites[bg_texture] = (Sprite){test, (SDL_Rect){0, 0, w, h}, (SDL_Rect){0}};
     
     AnimationState as = {};
     AnimationClip ac = {};
@@ -102,6 +105,7 @@ fail_sdl:
     *engine = (Engine){0};
     return false;
 }
+
 void engine_run(Engine *engine){
     if (!engine){
         LOG_ERROR("Invalid Engine argument");

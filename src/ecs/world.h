@@ -19,7 +19,7 @@ typedef struct {
     Health healths[MAX_ENTITIES];
     Sprite sprites[MAX_ENTITIES];
     Animation animations[MAX_ENTITIES];
-    Scroll scrolls[MAX_ENTITIES];
+    DontScroll scrolls[MAX_ENTITIES];
 
     Entity free_slot_list[MAX_ENTITIES]; 
     ComponentFlag entity_masks[MAX_ENTITIES];

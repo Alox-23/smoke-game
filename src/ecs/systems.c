@@ -1,3 +1,4 @@
+
 #include "systems.h"
 #include "components.h"
 #include "world.h"
@@ -19,7 +20,6 @@ void world_movement_system(World *w, float delta_time) {
             w->velocities[e].dz = 0;
         }
         else {
-            LOG_DEBUG("Velocity.z = %f", w->velocities[e].dz);
             w->velocities[e].dz -= GRAVITY * delta_time;   // see note below on this too
         }
         w->positions[e].z += w->velocities[e].dz * delta_time;    
@@ -48,7 +48,9 @@ void world_render_system(World* w, SDL_Renderer* r){
     ComponentFlag required = HAS_POSITION | HAS_SPRITE;
     for (Entity e = 0; e < w->entity_count; e++){
         if ((entity_mask_check(w->entity_masks[e], required))) continue;
-       
+
+        LOG_INFO("Entity %d is being rendered");
+        
         w->sprites[e].dst.x = (int)w->positions[e].x;
         w->sprites[e].dst.y = (int)w->positions[e].y - (int)w->positions[e].z;
 
@@ -94,7 +96,7 @@ void world_scroll_system(World* w, Entity ref){
         return;
     }
 
-    if (entity_mask_check(w->entity_masks[ref], HAS_VEOLOCITY)){
+    if (entity_mask_check(w->entity_masks[ref], HAS_VELOCITY)){
         LOG_WARN("Reference Entity does not have velocity component");
         return;
     }
@@ -106,7 +108,7 @@ void world_scroll_system(World* w, Entity ref){
         if (entity_mask_check(w->entity_masks[e], required)) continue;
         if (!entity_mask_check(w->entity_masks[e], forbiden)) continue;
 
-        w->positions[e].x += -1.0f * w->velocites[ref].dx;
-        w->positions[e].y += -1.0f * w->velocites[ref].dy;
+        w->positions[e].x += -1.0f * w->velocities[ref].dx;
+        w->positions[e].y += -1.0f * w->velocities[ref].dy;
     }
 }

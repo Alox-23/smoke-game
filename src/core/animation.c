@@ -82,8 +82,6 @@ bool animation_play_clip(AnimationState* as, int clip_index){
         return false;
     }
 
-    LOG_INFO("Playing clip with index %d", clip_index);
-
     as->active_clip_index = clip_index;
     
     return true;
