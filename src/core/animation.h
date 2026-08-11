@@ -38,7 +38,7 @@ bool animation_init_clip(AnimationClip* ac, SDL_Texture* atlas);
 bool animation_load_frames(AnimationClip* ac, Uint32 between_time, int frame_count, int frame_sizex, int frame_sizey, int frame_startx, int frame_starty);
 int animation_load_clip(AnimationState* as, AnimationClip ac, char* name);
 bool animation_play_clip(AnimationState* as, int clip_index);
-void animation_update_sate(AnimationState* as, float delat_time);
+void animation_update_sate(AnimationState* as, float delta_time);
 SDL_Rect* animation_get_rect(AnimationState* as);
 SDL_Texture* animation_get_texture(AnimationState* as);
 int animation_get_id_by_name(AnimationState* as, char* name);

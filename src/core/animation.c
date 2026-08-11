@@ -47,6 +47,7 @@ bool animation_load_frames(AnimationClip* ac, Uint32 between_time, int frame_cou
         }
         else{
             r.x = frame_startx * frame_sizex + i * frame_sizex;
+
             r.y = frame_starty * frame_sizey;
         }
 
@@ -94,7 +95,7 @@ bool animation_play_clip(AnimationState* as, int clip_index){
     return true;
 }
 
-void animation_update_sate(AnimationState* as, float delat_time){ 
+void animation_update_sate(AnimationState* as, float delta_time){ 
     if (!as){
         LOG_ERROR("Invalid AnimationState argument");
         return;
