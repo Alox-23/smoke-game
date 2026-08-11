@@ -24,8 +24,10 @@ Entity world_create_entity(World* w, ComponentFlag mask){
     else {
         e = w->entity_count++;
     }
-    
     w->entity_masks[e] = mask;
+
+    LOG_INFO("Created Entity %d, with component mask: %d", e, mask);
+    
     return e;
 }
 
