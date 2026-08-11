@@ -45,20 +45,22 @@ bool engine_init(Engine *engine, const char *title){
         LOG_ERROR("Failed to initialize World");
         goto fail_renderer;
     }
+    engine->world.scroll_offset.x = 400;
+    engine->world.scroll_offset.y = 300;
 
     SDL_Texture* test = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "assets/realistic/TEST7B.bmp");
     SDL_Texture* test2 = texture_manager_load_texture(&engine->texture_manager, engine->renderer, "assets/mana_seed/character_base/char_a_p1/char_a_p1_0bas_humn_v00.png");
 
-    Entity bg_texture = world_create_entity(&engine->world, HAS_POSITION | HAS_SPRITE | HAS_VELOCITY);
+    Entity bg_texture = world_create_entity(&engine->world, HAS_POSITION | HAS_SPRITE);
     int w;
     int h;
     int result = SDL_QueryTexture(test, NULL, NULL, &w, &h);
-    engine->world.positions[bg_texture] = (Position){0, 0, 0};
+    engine->world.positions[bg_texture] = (Vector3){0, 0, 0};
     engine->world.sprites[bg_texture] = (Sprite){test, (SDL_Rect){0, 0, w, h}, (SDL_Rect){0, 0, w*3, h*3}};
 
     engine->player = world_create_entity(&engine->world, HAS_POSITION | HAS_VELOCITY | HAS_HEALTH | HAS_ANIMATION | HAS_SPRITE); 
-    engine->world.positions[engine->player] = (Position){0, 0, 0};
-    engine->world.velocities[engine->player] = (Velocity){0, 0, 0};
+    engine->world.positions[engine->player] = (Vector3){0, 0, 0};
+    engine->world.velocities[engine->player] = (Vector3){0, 0, 0};
     engine->world.healths[engine->player].hp = 100;
     engine->world.sprites[engine->player].dst.w = 200;
     engine->world.sprites[engine->player].dst.h = 200;
@@ -164,7 +166,7 @@ void engine_update(Engine *engine){
     //THE ORDER OF THESE FUNCTIONS IS THE WAY IT NEEDS TO BE
     world_input_system_entity(&engine->world, engine->player, &engine->input_state);
     world_animation_system(&engine->world, engine->delta_time);
-    world_scroll_system(&engine->world, engine->player);
+    world_scroll_system(&engine->world, engine->player, engine->delta_time);
     world_movement_system(&engine->world, engine->delta_time);
     world_health_system(&engine->world);
     

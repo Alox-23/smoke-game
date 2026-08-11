@@ -4,12 +4,11 @@
 #include "../core/animation.h"
 
 //Component structs
-typedef struct{ float x, y, z; } Position;
-typedef struct{ float dx, dy, dz; } Velocity;
+typedef struct{ float x, y, z; } Vector3;
+typedef struct{ float x, y; } Vector2;
 typedef struct{ int hp; } Health;
 typedef AnimationState Animation;
 typedef struct { SDL_Texture* texture; SDL_Rect src; SDL_Rect dst; } Sprite; 
-typedef char DontScroll;
 
 //Constant defines
 typedef unsigned long long ComponentFlag;
@@ -18,6 +17,5 @@ typedef unsigned long long ComponentFlag;
 #define HAS_HEALTH    (1ULL << 2)
 #define HAS_ANIMATION (1ULL << 3)
 #define HAS_SPRITE    (1ULL << 4)
-#define HAS_DONT_SCROLL (1ULL << 5)
 
 #endif
