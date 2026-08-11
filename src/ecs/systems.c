@@ -10,7 +10,7 @@ static bool entity_mask_check(ComponentFlag a, ComponentFlag b){
 void world_movement_system(World *w, float delta_time) {
     ComponentFlag required = HAS_POSITION | HAS_VELOCITY;
     for (Entity e = 0; e < (Entity)w->entity_count; e++) {
-        if ((entity_mask_check(w->entity_masks[e], required))) continue;
+        if (entity_mask_check(w->entity_masks[e], required)) continue;
         w->positions[e].x += w->velocities[e].dx * delta_time;
         w->positions[e].y += w->velocities[e].dy * delta_time;
         
@@ -29,7 +29,7 @@ void world_movement_system(World *w, float delta_time) {
 void world_animation_system(World* w, float delta_time){
     ComponentFlag required = HAS_SPRITE | HAS_ANIMATION;
     for (Entity e = 0; e < (Entity)w->entity_count; e++){
-        if ((entity_mask_check(w->entity_masks[e], required))) continue;
+        if (entity_mask_check(w->entity_masks[e], required)) continue;
        
         Velocity v = w->velocities[e];
 
@@ -47,10 +47,8 @@ void world_animation_system(World* w, float delta_time){
 void world_render_system(World* w, SDL_Renderer* r){
     ComponentFlag required = HAS_POSITION | HAS_SPRITE;
     for (Entity e = 0; e < w->entity_count; e++){
-        if ((entity_mask_check(w->entity_masks[e], required))) continue;
+        if (entity_mask_check(w->entity_masks[e], required)) continue;
 
-        LOG_INFO("Entity %d is being rendered");
-        
         w->sprites[e].dst.x = (int)w->positions[e].x;
         w->sprites[e].dst.y = (int)w->positions[e].y - (int)w->positions[e].z;
 
@@ -61,16 +59,45 @@ void world_render_system(World* w, SDL_Renderer* r){
 void world_health_system(World *w) {
     ComponentFlag required = HAS_HEALTH;
     for (Entity e = 0; e < (Entity)w->entity_count; e++) {
-        if ((entity_mask_check(w->entity_masks[e], required))) continue;
+        if (entity_mask_check(w->entity_masks[e], required)) continue;
         if (w->healths[e].hp <= 0) {
             LOG_INFO("Entity %u died\n", e);
         }
     }
 }
 
+void world_scroll_system(World* w, Entity ref){
+    if (!w){
+        LOG_ERROR("Invalid World argument");
+        return;
+    }
+
+    if (entity_mask_check(w->entity_masks[ref], HAS_VELOCITY)){
+        LOG_WARN("Reference Entity does not have velocity component");
+        return;
+    }
+
+    ComponentFlag required = HAS_VELOCITY;
+    ComponentFlag forbiden = HAS_DONT_SCROLL;
+    
+    for (Entity e = 0; e < w->entity_count; e++){
+        if (entity_mask_check(w->entity_masks[e], required)) continue;
+        if (!entity_mask_check(w->entity_masks[e], forbiden)) continue;
+
+        LOG_DEBUG("Ref %d, has vel={%3.f, %3.f}", ref, w->velocities[ref].dx, w->velocities[ref].dy);
+
+        w->velocities[e].dx = -1.0f * w->velocities[ref].dx;
+        w->velocities[e].dy = -1.0f * w->velocities[ref].dy;
+        w->velocities[ref].dx = 0;
+        w->velocities[ref].dy = 0;
+        
+        LOG_DEBUG("Entity %d, has sprite.dst={%d, %d}", e, w->sprites[e].dst.x, w->sprites[e].dst.y);
+    }
+}
+
 void world_input_system_entity(World* w, Entity e, InputState* state){
     ComponentFlag required = HAS_VELOCITY;
-    if ((entity_mask_check(w->entity_masks[e], required))){
+    if (entity_mask_check(w->entity_masks[e], required)){
         return;
     }
 
@@ -87,28 +114,5 @@ void world_input_system_entity(World* w, Entity e, InputState* state){
     if (state->is_jump_pressed && w->positions[e].z == 0){
        w->velocities[e].dz = PLAYER_JUMP_STRENGTH;
        LOG_DEBUG("Player jumped");
-    }
-}
-
-void world_scroll_system(World* w, Entity ref){
-    if (!w){
-        LOG_ERROR("Invalid World argument");
-        return;
-    }
-
-    if (entity_mask_check(w->entity_masks[ref], HAS_VELOCITY)){
-        LOG_WARN("Reference Entity does not have velocity component");
-        return;
-    }
-
-    ComponentFlag required = HAS_POSITION;
-    ComponentFlag forbiden = HAS_DONT_SCROLL;
-    
-    for (Entity e = 0; e < w->entity_count; e++){
-        if (entity_mask_check(w->entity_masks[e], required)) continue;
-        if (!entity_mask_check(w->entity_masks[e], forbiden)) continue;
-
-        w->positions[e].x += -1.0f * w->velocities[ref].dx;
-        w->positions[e].y += -1.0f * w->velocities[ref].dy;
     }
 }
