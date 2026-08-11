@@ -14,12 +14,14 @@
 typedef uint32_t Entity;
 
 typedef struct {
-    Position positions[MAX_ENTITIES];
-    Velocity velocities[MAX_ENTITIES];
+    Vector3 positions[MAX_ENTITIES];
+    Vector3 velocities[MAX_ENTITIES];
     Health healths[MAX_ENTITIES];
     Sprite sprites[MAX_ENTITIES];
     Animation animations[MAX_ENTITIES];
 
+    Vector2 scroll_offset;
+    
     Entity free_slot_list[MAX_ENTITIES]; 
     ComponentFlag entity_masks[MAX_ENTITIES];
 
