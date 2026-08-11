@@ -26,20 +26,35 @@ void world_movement_system(World *w, float delta_time) {
 }
 
 void world_animation_system(World* w, float delta_time){
-    ComponentFlag required = HAS_SPRITE | HAS_ANIMATION;
+    unsigned int required = HAS_SPRITE | HAS_ANIMATION | HAS_VELOCITY | HAS_POSITION;
     for (Entity e = 0; e < (Entity)w->entity_count; e++){
         if (entity_mask_check(w->entity_masks[e], required)) continue;
-       
-        Vector3 v = w->velocities[e];
 
-        if (v.x > 0) animation_play_clip(&w->animations[e], animation_get_id_by_name(&w->animations[e], "walk_right"));
-        if (v.x < 0) animation_play_clip(&w->animations[e], animation_get_id_by_name(&w->animations[e], "walk_left"));
-        if (v.y > 0) animation_play_clip(&w->animations[e], animation_get_id_by_name(&w->animations[e], "walk_down"));
-        if (v.y < 0) animation_play_clip(&w->animations[e], animation_get_id_by_name(&w->animations[e], "walk_up"));
+        Velocity v = w->velocities[e];
+        AnimationState* a = &w->animations[e];
+        bool airborne = w->positions[e].z > 0.0f;
 
-        if (v.x != 0 || v.y != 0 || v.z != 0) animation_update_sate(&w->animations[e], delta_time);
-        w->sprites[e].src = *animation_get_rect(&w->animations[e]);
-        w->sprites[e].texture = animation_get_texture(&w->animations[e]);
+        char* clip;
+
+        if (airborne){
+            if      (v.dy > 0) clip = "jump_down";
+            else if (v.dy < 0) clip = "jump_up";
+            else if (v.dx > 0) clip = "jump_right";
+            else if (v.dx < 0) clip = "jump_left";
+            else               clip = "jump_up";     /* vertical jump */
+        } else {
+            if      (v.dy > 0) clip = "walk_down";
+            else if (v.dy < 0) clip = "walk_up";
+            else if (v.dx > 0) clip = "walk_right";
+            else if (v.dx < 0) clip = "walk_left";
+            else               clip = "idle";
+        }
+
+        animation_play_clip(a, animation_get_id_by_name(a, clip));
+        animation_update_sate(a, delta_time);
+
+        w->sprites[e].src     = *animation_get_rect(a);
+        w->sprites[e].texture =  animation_get_texture(a);
     }
 }
 

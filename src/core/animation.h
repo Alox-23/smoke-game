@@ -16,6 +16,7 @@
 typedef struct{
     SDL_Texture* atlas;
     SDL_Rect frames[MAX_ANIMATION_FRAMES];
+    int freeze_frame;
     int frame_count;
     int current_frame_index;
 
@@ -27,6 +28,7 @@ typedef struct{
 
 typedef struct{
     AnimationClip clips[MAX_ANIMATION_CLIPS];
+    bool unfreeze;
     char* clip_names[MAX_ANIMATION_CLIPS];
     uint32_t active_clip_index;
     int clip_count;
@@ -40,5 +42,7 @@ void animation_update_sate(AnimationState* as, float delat_time);
 SDL_Rect* animation_get_rect(AnimationState* as);
 SDL_Texture* animation_get_texture(AnimationState* as);
 int animation_get_id_by_name(AnimationState* as, char* name);
+bool animation_set_freeze_on_frame(AnimationState* as, char* clip_name, int frame);
+bool animation_unfreeze(AnimationState* as);
 
 #endif
