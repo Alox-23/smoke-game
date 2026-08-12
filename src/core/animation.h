@@ -11,7 +11,6 @@
 #define MAX_ANIMATION_CLIPS 32
 #define MAX_ANIMATION_CLIP_NAME_CHARS 128
 #define INVALID_CLIP_INDEX UINT32_MAX
-#define NAME_CHAR_COUNT 128
 
 typedef struct{
     SDL_Texture* atlas;
@@ -48,4 +47,5 @@ int animation_get_id_by_name(AnimationState* as, char* name);
 bool animation_set_freeze_on_frame(AnimationState* as, char* clip_name, int frame);
 bool animation_unfreeze(AnimationState* as);
 
+bool animation_helper_func(AnimationState* as, SDL_Texture* text);
 #endif

@@ -188,3 +188,60 @@ bool animation_unfreeze(AnimationState* as){
     }
     return true;
 }
+
+bool animation_helper_func(AnimationState* as, SDL_Texture* text){
+    if (!as) {
+        LOG_ERROR("Invalid AnimationState argument");
+        return false;
+    }
+
+    AnimationClip ac = {};
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 6, 64, 64, 0, 4);
+    int walk_down = animation_load_clip(as, ac, "walk_down");
+    
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 6, 64, 64, 0, 6);
+    int walk_right = animation_load_clip(as, ac, "walk_right");
+    
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 6, 64, 64, 0, 5);
+    int walk_up = animation_load_clip(as, ac, "walk_up");
+    
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 6, 64, 64, 0, 7);
+    int walk_left = animation_load_clip(as, ac, "walk_left");
+
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 1, 64, 64, 0, 4);
+    int idle_down = animation_load_clip(as, ac, "idle_down");
+    
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 1, 64, 64, 0, 6);
+    int idle_right = animation_load_clip(as, ac, "idle_right");
+    
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 1, 64, 64, 0, 5);
+    int idle_up = animation_load_clip(as, ac, "idle_up");
+    
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 1, 64, 64, 0, 7);
+    int idle_left = animation_load_clip(as, ac, "idle_left");
+
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 1, 64, 64, 6, 1);
+    int jump_up = animation_load_clip(as, ac, "jump_up");
+
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 1, 64, 64, 6, 2);
+    int jump_right= animation_load_clip(as, ac, "jump_right");
+
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 1 , 64, 64, 6, 3);
+    int jump_left= animation_load_clip(as, ac, "jump_left");
+
+    animation_init_clip(&ac, text);
+    animation_load_frames(&ac, 200, 1, 64, 64, 6, 0);
+    int jump_down = animation_load_clip(as, ac, "jump_down");
+
+}

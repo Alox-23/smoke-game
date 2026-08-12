@@ -31,6 +31,15 @@ void world_animation_system(World* w, float delta_time){
         if (entity_mask_check(w->entity_masks[e], required)) continue;
 
         Vector3 v = w->velocities[e];
+
+        // update last-faced direction only when actually moving,
+        // used for idle clips so they keep the last direction moved
+        if (v.x > 0)      w->animations[e].dirx = 1;
+        else if (v.x < 0) w->animations[e].dirx = -1;
+
+        if (v.y > 0)      w->animations[e].diry = 1;
+        else if (v.y < 0) w->animations[e].diry = -1;
+
         int dirx = w->animations[e].dirx;
         int diry = w->animations[e].diry;
         AnimationState* a = &w->animations[e];
@@ -39,18 +48,21 @@ void world_animation_system(World* w, float delta_time){
         char* clip = NULL;
 
         if (airborne){
-            if      (diry > 0) clip = "jump_down";
-            else if (diry < 0) clip = "jump_up";
-            else if (dirx > 0) clip = "jump_right";
-            else if (dirx < 0) clip = "jump_left";
+            // use CURRENT velocity for direction, not stale dirx/diry
+            if      (v.y > 0) clip = "jump_down";
+            else if (v.y < 0) clip = "jump_up";
+            else if (v.x > 0) clip = "jump_right";
+            else if (v.x < 0) clip = "jump_left";
         }
         else if (walking){
-            if      (diry > 0) clip = "walk_down";
-            else if (diry < 0) clip = "walk_up";
-            else if (dirx > 0) clip = "walk_right";
-            else if (dirx < 0) clip = "walk_left";
+            // same here: current velocity, not stale dirx/diry
+            if      (v.y > 0) clip = "walk_down";
+            else if (v.y < 0) clip = "walk_up";
+            else if (v.x > 0) clip = "walk_right";
+            else if (v.x < 0) clip = "walk_left";
         }
         else{
+            // idle: use persisted last-faced direction
             if      (diry > 0) clip = "idle_down";
             else if (diry < 0) clip = "idle_up";
             else if (dirx > 0) clip = "idle_right";
@@ -72,8 +84,6 @@ void world_render_system(World* w, SDL_Renderer* r){
 
         w->sprites[e].dst.x = w->positions[e].x + w->scroll_offset.x;
         w->sprites[e].dst.y = w->positions[e].y - w->positions[e].z + w-> scroll_offset.y;
-
-        LOG_DEBUG("{%3.f, %3.f}, {%3.f, %3.f}", w->positions[e].x, w->positions[e].y, w->velocities[e].x, w->velocities[e].y);
 
         SDL_Rect dst_centered = {
             w->sprites[e].dst.x - w->sprites[e].dst.w / 2,
@@ -120,8 +130,6 @@ void world_input_system_entity(World* w, Entity e, InputState* state){
     float magnitude = sqrtf(state->move_x * state->move_x + state->move_y * state->move_y);
 
     if (magnitude > 0.0001f){
-        w->animations[e].dirx = state->move_x;
-        w->animations[e].diry = state->move_y;
         w->velocities[e].x = state->move_x * PLAYER_SPEED / magnitude;
         w->velocities[e].y = state->move_y * PLAYER_SPEED / magnitude;
     } else {
