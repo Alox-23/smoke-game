@@ -32,6 +32,9 @@ typedef struct{
     char* clip_names[MAX_ANIMATION_CLIPS];
     uint32_t active_clip_index;
     int clip_count;
+
+    int dirx;
+    int diry;
 } AnimationState;
 
 bool animation_init_clip(AnimationClip* ac, SDL_Texture* atlas);
