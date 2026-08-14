@@ -12,7 +12,7 @@ void world_movement_system(World *w, float delta_time) {
         if (entity_mask_check(w->entity_masks[e], required)) continue;
         w->positions[e].x += w->velocities[e].x * delta_time;
         w->positions[e].y += w->velocities[e].y * delta_time;
-        
+
         if (w->positions[e].z <= 0 && w->velocities[e].z <= 0){
             // grounded and not moving upward: snap to floor, stop falling
             w->positions[e].z = 0;
@@ -66,6 +66,10 @@ void world_animation_system(World* w, float delta_time){
             else if (horizontal) {
                 if      (v.x > 0) clip = "walk_right";
                 else if (v.x < 0) clip = "walk_left";
+            }
+            else {
+                if      (v.y > 0) clip = "walk_down";
+                else if (v.y < 0) clip = "walk_up";
             }
         }
         else{

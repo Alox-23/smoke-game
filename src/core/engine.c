@@ -30,7 +30,7 @@ bool engine_init(Engine *engine, const char *title){
         goto fail_img;
     }
 
-    engine->renderer = SDL_CreateRenderer(engine->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    engine->renderer = SDL_CreateRenderer(engine->window, -1, SDL_RENDERER_ACCELERATED);
     if (!engine->renderer){
         LOG_ERROR("SDL_CreateRenderer: %s", SDL_GetError());
         goto fail_window;
@@ -45,6 +45,7 @@ bool engine_init(Engine *engine, const char *title){
         LOG_ERROR("Failed to initialize World");
         goto fail_renderer;
     }
+
     engine->world.scroll_offset.x = 400;
     engine->world.scroll_offset.y = 300;
 
@@ -121,7 +122,7 @@ void engine_run(Engine *engine){
 
     LOG_INFO("Engine is running");
 
-    engine->last_tick = SDL_GetTicks64();
+    engine->last_tick = SDL_GetPerformanceCounter();
     engine->running = true;
 
     while (engine->running){
@@ -137,12 +138,8 @@ void engine_tick(Engine *engine){
         return;
     }
 
-    float fps = 1.0f / engine->delta_time;
-    LOG_DEBUG("Current fps: %.3f", fps);
-    
-    // timing stuff
-    Uint64 now = SDL_GetTicks64();
-    engine->delta_time = (now - engine->last_tick) / 1000.0f;
+    Uint64 now = SDL_GetPerformanceCounter();
+    engine->delta_time = (float)(now - engine->last_tick) / (float)SDL_GetPerformanceFrequency();
     engine->last_tick = now;
 
     //increment the tick for logger
