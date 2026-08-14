@@ -26,8 +26,6 @@ Entity world_create_entity(World* w, ComponentFlag mask){
     }
     w->entity_masks[e] = mask;
 
-    LOG_INFO("Created Entity %d, with component mask: %d", e, mask);
-    
     return e;
 }
 
