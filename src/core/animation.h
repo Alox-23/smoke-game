@@ -32,8 +32,8 @@ typedef struct{
     uint32_t active_clip_index;
     int clip_count;
 
-    int dirx;
-    int diry;
+    int facing_axis; // 0 = horizontal, 1 = vertical
+    int facing_sign; // +1 or -1
 } AnimationState;
 
 bool animation_init_clip(AnimationClip* ac, SDL_Texture* atlas);

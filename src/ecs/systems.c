@@ -32,22 +32,23 @@ void world_animation_system(World* w, float delta_time){
 
         Vector3 v = w->velocities[e];
         Vector3 vabs = (Vector3){fabs(w->velocities[e].x), fabs(w->velocities[e].y), fabs(w->velocities[e].z)};
-        
-        // update last-faced direction only when actually moving,
-        // used for idle clips so they keep the last direction moved
-        if (v.x > 0)      w->animations[e].dirx = 1;
-        else if (v.x < 0) w->animations[e].dirx = -1;
-
-        if (v.y > 0)      w->animations[e].diry = 1;
-        else if (v.y < 0) w->animations[e].diry = -1;
-
-        int dirx = w->animations[e].dirx;
-        int diry = w->animations[e].diry;
         AnimationState* a = &w->animations[e];
+
+        if (v.x != 0.0f || v.y != 0.0f) {
+            if (vabs.x > vabs.y) {
+                a->facing_axis = 0;
+                a->facing_sign = (v.x > 0) ? 1 : -1;
+            } else {
+                a->facing_axis = 1;
+                a->facing_sign = (v.y > 0) ? 1 : -1;
+            }
+        }
+                
         bool airborne = w->positions[e].z > 0.0f;
         bool walking = v.x != 0.0f || v.y != 0.0f;
         bool horizontal = vabs.x > vabs.y;
         bool vertical = vabs.y > vabs.x;
+
         char* clip = NULL;
 
         if (airborne){
@@ -72,12 +73,13 @@ void world_animation_system(World* w, float delta_time){
                 else if (v.y < 0) clip = "walk_up";
             }
         }
-        else{
-            // idle: use persisted last-faced direction
-            if      (diry > 0) clip = "idle_down";
-            else if (diry < 0) clip = "idle_up";
-            else if (dirx > 0) clip = "idle_right";
-            else if (dirx < 0) clip = "idle_left";
+
+        else { // idle
+            if (a->facing_axis == 1) {
+                clip = (a->facing_sign > 0) ? "idle_down" : "idle_up";
+            } else {
+                clip = (a->facing_sign > 0) ? "idle_right" : "idle_left";
+            }
         }
 
         if (clip) animation_play_clip(a, animation_get_id_by_name(a, clip));
