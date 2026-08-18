@@ -5,6 +5,7 @@
 #include "world.h"
 #include "../core/input.h"
 
+#include <math.h>
 #include <SDL2/SDL_render.h>
 
 void world_movement_system(World* w, float delta_time);

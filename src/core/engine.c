@@ -30,7 +30,7 @@ bool engine_init(Engine *engine, const char *title){
         goto fail_img;
     }
 
-    engine->renderer = SDL_CreateRenderer(engine->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    engine->renderer = SDL_CreateRenderer(engine->window, -1, SDL_RENDERER_ACCELERATED);
     if (!engine->renderer){
         LOG_ERROR("SDL_CreateRenderer: %s", SDL_GetError());
         goto fail_window;
@@ -45,6 +45,7 @@ bool engine_init(Engine *engine, const char *title){
         LOG_ERROR("Failed to initialize World");
         goto fail_renderer;
     }
+
     engine->world.scroll_offset.x = 400;
     engine->world.scroll_offset.y = 300;
 
@@ -66,45 +67,34 @@ bool engine_init(Engine *engine, const char *title){
     engine->world.sprites[engine->player].dst.h = 200;
     
     AnimationState as = {};
-    AnimationClip ac = {};
-    animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 6, 64, 64, 0, 4);
-    int walk_down = animation_load_clip(&as, ac, "walk_down");
-    
-    animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 6, 64, 64, 0, 6);
-    int walk_right = animation_load_clip(&as, ac, "walk_right");
-    
-    animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 6, 64, 64, 0, 5);
-    int walk_up = animation_load_clip(&as, ac, "walk_up");
-    
-    animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 6, 64, 64, 0, 7);
-    int walk_left = animation_load_clip(&as, ac, "walk_left");
+    animation_helper_func(&as, test2);
+    animation_play_clip(&as, animation_get_id_by_name(&as, "idle_down"));
 
-    animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 6, 64, 64, 0, 0);
-    int idle = animation_load_clip(&as, ac, "walk_down");
 
-    animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 1, 64, 64, 6, 1);
-    int jump_up = animation_load_clip(&as, ac, "jump_up");
+    #define NUM_RANDOM_ENTITIES 50
 
-    animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 1, 64, 64, 6, 2);
-    int jump_right= animation_load_clip(&as, ac, "jump_right");
+    for (int i = 0; i < NUM_RANDOM_ENTITIES; i++) {
+        Entity e = world_create_entity(&engine->world,
+            HAS_POSITION | HAS_VELOCITY | HAS_SPRITE | HAS_ANIMATION);
 
-    animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 1 , 64, 64, 6, 3);
-    int jump_left= animation_load_clip(&as, ac, "jump_left");
+        float x = (float)(rand() % 800);
+        float y = (float)(rand() % 600);
+        float vx = ((float)rand() / RAND_MAX) * 200.0f - 100.0f;
+        float vy = ((float)rand() / RAND_MAX) * 200.0f - 100.0f;
 
-    animation_init_clip(&ac, test2);
-    animation_load_frames(&ac, 200, 1, 64, 64, 6, 0);
-    int jump_down = animation_load_clip(&as, ac, "jump_down");
+        engine->world.positions[e]  = (Vector3){x, y, 0};
+        engine->world.velocities[e] = (Vector3){vx, vy, 0};
 
-    animation_play_clip(&as, animation_get_id_by_name(&as, "walk_down"));
+        engine->world.sprites[e].dst.w = 200;
+        engine->world.sprites[e].dst.h = 200;
 
+        AnimationState as = {};
+        animation_helper_func(&as, test2);
+        animation_play_clip(&as, animation_get_id_by_name(&as, "idle_down"));
+
+        engine->world.animations[e] = as;
+    }
+        
     engine->world.animations[engine->player] = as;
 
     engine->running = false;
@@ -132,7 +122,7 @@ void engine_run(Engine *engine){
 
     LOG_INFO("Engine is running");
 
-    engine->last_tick = SDL_GetTicks64();
+    engine->last_tick = SDL_GetPerformanceCounter();
     engine->running = true;
 
     while (engine->running){
@@ -148,9 +138,8 @@ void engine_tick(Engine *engine){
         return;
     }
 
-    // timing stuff
-    Uint64 now = SDL_GetTicks64();
-    engine->delta_time = (now - engine->last_tick) / 1000.0f;
+    Uint64 now = SDL_GetPerformanceCounter();
+    engine->delta_time = (float)(now - engine->last_tick) / (float)SDL_GetPerformanceFrequency();
     engine->last_tick = now;
 
     //increment the tick for logger

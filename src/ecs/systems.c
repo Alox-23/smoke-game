@@ -12,7 +12,7 @@ void world_movement_system(World *w, float delta_time) {
         if (entity_mask_check(w->entity_masks[e], required)) continue;
         w->positions[e].x += w->velocities[e].x * delta_time;
         w->positions[e].y += w->velocities[e].y * delta_time;
-        
+
         if (w->positions[e].z <= 0 && w->velocities[e].z <= 0){
             // grounded and not moving upward: snap to floor, stop falling
             w->positions[e].z = 0;
@@ -31,23 +31,55 @@ void world_animation_system(World* w, float delta_time){
         if (entity_mask_check(w->entity_masks[e], required)) continue;
 
         Vector3 v = w->velocities[e];
+        Vector3 vabs = (Vector3){fabs(w->velocities[e].x), fabs(w->velocities[e].y), fabs(w->velocities[e].z)};
         AnimationState* a = &w->animations[e];
-        bool airborne = w->positions[e].z > 0.0f;
 
-        char* clip;
+        if (v.x != 0.0f || v.y != 0.0f) {
+            if (vabs.x > vabs.y) {
+                a->facing_axis = 0;
+                a->facing_sign = (v.x > 0) ? 1 : -1;
+            } else {
+                a->facing_axis = 1;
+                a->facing_sign = (v.y > 0) ? 1 : -1;
+            }
+        }
+                
+        bool airborne = w->positions[e].z > 0.0f;
+        bool walking = v.x != 0.0f || v.y != 0.0f;
+        bool horizontal = vabs.x > vabs.y;
+        bool vertical = vabs.y > vabs.x;
+
+        char* clip = NULL;
 
         if (airborne){
+            // use CURRENT velocity for direction, not stale dirx/diry
             if      (v.y > 0) clip = "jump_down";
             else if (v.y < 0) clip = "jump_up";
             else if (v.x > 0) clip = "jump_right";
             else if (v.x < 0) clip = "jump_left";
-            else              clip = "jump_up";     /* vertical jump */
-        } else {
-            if      (v.y > 0) clip = "walk_down";
-            else if (v.y < 0) clip = "walk_up";
-            else if (v.x > 0) clip = "walk_right";
-            else if (v.x < 0) clip = "walk_left";
-            else              clip = NULL;
+        }
+        else if (walking){
+            // same here: current velocity, not stale dirx/diry
+            if      (vertical) {
+                if      (v.y > 0) clip = "walk_down";
+                else if (v.y < 0) clip = "walk_up";
+            }
+            else if (horizontal) {
+                if      (v.x > 0) clip = "walk_right";
+                else if (v.x < 0) clip = "walk_left";
+            }
+            else {
+                if      (v.y > 0) clip = "walk_down";
+                else if (v.y < 0) clip = "walk_up";
+            }
+        }
+
+        else { // idle
+            if (a->facing_axis == 1) {
+                clip = (a->facing_sign > 0) ? "idle_down" : "idle_up";
+            } else {
+                clip = (a->facing_sign > 0) ? "idle_right" : "idle_left";
+            }
         }
 
         if (clip) animation_play_clip(a, animation_get_id_by_name(a, clip));
@@ -65,8 +97,6 @@ void world_render_system(World* w, SDL_Renderer* r){
 
         w->sprites[e].dst.x = w->positions[e].x + w->scroll_offset.x;
         w->sprites[e].dst.y = w->positions[e].y - w->positions[e].z + w-> scroll_offset.y;
-
-        LOG_DEBUG("{%3.f, %3.f}, {%3.f, %3.f}", w->positions[e].x, w->positions[e].y, w->velocities[e].x, w->velocities[e].y);
 
         SDL_Rect dst_centered = {
             w->sprites[e].dst.x - w->sprites[e].dst.w / 2,
